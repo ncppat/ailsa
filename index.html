@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品定價自動計算器 (修正版)</title>
+    <title>商品定價計算器</title>
     <style>
         body { font-family: "Microsoft JhengHei", Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .calculator { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); width: 360px; }
@@ -45,7 +45,7 @@
 
     <div class="form-group">
         <label for="percent">4. 抽成/利潤百分比 (%)</label>
-        <input type="number" id="percent" placeholder="例如蝦皮抽成填 20">
+        <input type="number" id="percent" placeholder="例如抽成末售的20%填 20">
         <div class="note">邏輯：成本 ÷ (100% - 填寫%) <br> 填 20 代表售價的 20% 是抽成/利潤</div>
     </div>
 
@@ -55,7 +55,7 @@
         <p>總成本 (含稅+運)：<b id="baseCost">0</b></p>
         <p>建議售價：</p>
         <div class="final-price" id="finalPrice">0</div>
-        <p style="font-size: 12px; color: #555;">(以此售價賣出，扣除 <span id="cutPercent"></span>% 後剛好回本)</p>
+        <p style="font-size: 12px; color: #555;">(此售價含稅含運，扣除 <span id="cutPercent"></span>% 後是成本價)</p>
     </div>
 </div>
 
