@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品定價自動計算器 (修正版)</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .calculator { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); width: 360px; }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; border-bottom: 2px solid #28a745; padding-bottom: 10px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #444; }
+        input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .radio-group { display: flex; gap: 20px; margin-top: 5px; }
+        button { width: 100%; padding: 14px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 18px; cursor: pointer; transition: 0.2s; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 25px; padding: 20px; background-color: #e2e6ea; border-radius: 8px; text-align: center; }
+        .result p { margin: 8px 0; font-size: 15px; }
+        .final-price { font-size: 32px; color: #dc3545; font-weight: bold; margin-top: 10px; }
+        .note { font-size: 13px; color: #666; margin-top: 5px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <h2>📊 商品定價計算器</h2>
+
+    <div class="form-group">
+        <label for="cost">1. 商品成本價 ($)</label>
+        <input type="number" id="cost" placeholder="輸入成本金額">
+    </div>
+
+    <div class="form-group">
+        <label>2. 是否已含稅？</label>
+        <div class="radio-group">
+            <label><input type="radio" name="tax" value="included" checked> 已含稅</label>
+            <label><input type="radio" name="tax" value="excluded"> 未含稅 (x1.05)</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="shipping">3. 運費 ($)</label>
+        <input type="number" id="shipping" placeholder="若已含運請填 0">
+    </div>
+
+    <div class="form-group">
+        <label for="percent">4. 抽成/利潤百分比 (%)</label>
+        <input type="number" id="percent" placeholder="例如蝦皮抽成填 20">
+        <div class="note">邏輯：成本 ÷ (100% - 填寫%) <br> 填 20 代表售價的 20% 是抽成/利潤</div>
+    </div>
+
+    <button onclick="calculatePrice()">計算售價</button>
+
+    <div class="result" id="resultArea" style="display:none;">
+        <p>總成本 (含稅+運)：<b id="baseCost">0</b></p>
+        <p>建議售價：</p>
+        <div class="final-price" id="finalPrice">0</div>
+        <p style="font-size: 12px; color: #555;">(以此售價賣出，扣除 <span id="cutPercent"></span>% 後剛好回本)</p>
+    </div>
+</div>
+
+<script>
+    function calculatePrice() {
+        // 1. 獲取成本
+        let cost = parseFloat(document.getElementById('cost').value);
+        if (isNaN(cost)) { alert("請輸入成本金額"); return; }
+        
+        // 2. 判斷稅額
+        let taxOption = document.querySelector('input[name="tax"]:checked').value;
+        if (taxOption === 'excluded') {
+            cost = cost * 1.05;
+        }
+
+        // 3. 加上運費
+        let shipping = parseFloat(document.getElementById('shipping').value);
+        if (isNaN(shipping)) shipping = 0; 
+        
+        let totalBaseCost = cost + shipping;
+
+        // 4. 計算邏輯修正
+        let percentInput = parseFloat(document.getElementById('percent').value);
+        
+        if (isNaN(percentInput)) {
+            alert("請輸入百分比");
+            return;
+        }
+        if (percentInput >= 100) {
+            alert("抽成不能超過或等於 100%，這樣售價會變成無限大！");
+            return;
+        }
+
+        // 修正後的公式：總成本 / (1 - (百分比/100))
+        // 例如 20% -> 總成本 / 0.8
+        let divisor = 1 - (percentInput / 100);
+        let finalPrice = totalBaseCost / divisor;
+
+        // 顯示結果
+        document.getElementById('baseCost').innerText = totalBaseCost.toFixed(2);
+        document.getElementById('cutPercent').innerText = percentInput;
+        document.getElementById('finalPrice').innerText = "$" + Math.ceil(finalPrice); 
+        document.getElementById('resultArea').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
